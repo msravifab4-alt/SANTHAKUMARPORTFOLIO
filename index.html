@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>MSEC Smart Workspace</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: #0f172a;
+      color: #e5e7eb;
+      text-align: center;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 400px;
+      padding: 20px;
+    }
+
+    .logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 12px;
+      object-fit: contain;
+      margin-bottom: 10px;
+    }
+
+    .college-logo {
+      width: 120px;
+      margin-bottom: 10px;
+    }
+
+    .title {
+      font-size: 1.7rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: #ffffff;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      margin-bottom: 25px;
+    }
+
+    .btn {
+      width: 100%;
+      border: none;
+      border-radius: 999px;
+      padding: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: #facc15;
+      color: #111827;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: 0.2s;
+    }
+
+    .btn:hover {
+      background: #eab308;
+      transform: translateY(-2px);
+    }
+
+    .google-icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    .status {
+      margin-top: 12px;
+      font-size: 0.8rem;
+      color: #94a3b8;
+    }
+
+    .user-box {
+      background: rgba(255,255,255,0.05);
+      padding: 12px;
+      border-radius: 10px;
+      margin-top: 20px;
+      display: none;
+    }
+
+    .user-name {
+      color: #a5b4fc;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- 🔷 Logos -->
+    <img src="https://res.cloudinary.com/debjhzcli/image/upload/v1763531585/bbbb123_tr22yc.jpg" class="college-logo" alt="College Logo">
+
+    <!-- 🔷 Title -->
+    <div class="title">MSEC Smart Workspace</div>
+    <div class="subtitle">By Ellectra</div>
+
+    <!-- 🔷 Google Login Button -->
+    <button id="loginBtn" class="btn">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="google-icon">
+      Sign in with Google
+    </button>
+
+    <!-- 🔷 Already Logged In View -->
+    <div class="user-box" id="userBox">
+      <div>Welcome, <span class="user-name" id="userName"></span></div>
+      <button id="continueBtn" class="btn" style="margin-top: 10px;">Continue</button>
+      <button id="logoutBtn" class="btn" style="background:#64748b; margin-top: 10px;">Logout</button>
+    </div>
+
+    <div id="status" class="status">Checking login...</div>
+  </div>
+
+  <!-- 🔥 Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+
+    // ---------------- YOUR CONFIG ----------------
+    const firebaseConfig = {
+      apiKey: "AIzaSyDGUw_al5gy_0TukxMBIISo4l8qmvslfMc",
+      authDomain: "msecsmartworkspace.firebaseapp.com",
+      databaseURL: "https://msecsmartworkspace-default-rtdb.firebaseio.com",
+      projectId: "msecsmartworkspace",
+      storageBucket: "msecsmartworkspace.firebasestorage.app",
+      messagingSenderId: "1016984423654",
+      appId: "1:1016984423654:web:6294453b286d664954ff27"
+    };
+
+    // Init Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    // Keep logged in
+    setPersistence(auth, browserLocalPersistence);
+
+    // UI
+    const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const continueBtn = document.getElementById("continueBtn");
+    const statusEl = document.getElementById("status");
+    const userBox = document.getElementById("userBox");
+    const userNameEl = document.getElementById("userName");
+
+    // Login
+    loginBtn.onclick = async () => {
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (e) {
+        statusEl.textContent = "Login Failed: " + e.message;
+      }
+    };
+
+    // Logout
+    logoutBtn.onclick = async () => {
+      await signOut(auth);
+    };
+
+    // Continue action
+    continueBtn.onclick = () => {
+      window.location.href = "dashboard.html"; // change later
+    };
+
+    // Auto Login Listener
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        loginBtn.style.display = "none";
+        userBox.style.display = "block";
+        userNameEl.textContent = user.displayName;
+        statusEl.textContent = "Logged in ✔";
+      } else {
+        loginBtn.style.display = "block";
+        userBox.style.display = "none";
+        statusEl.textContent = "Please sign in.";
+      }
+    });
+  </script>
+
+</body>
+</html>
